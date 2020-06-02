@@ -59,7 +59,9 @@ def getTest(message):
     print(get_investopedia())
 
     return jsonify({
-        'result': message
+        'result': message,
+        'dictionary':get_dictionary(),
+        'investopedia':get_investopedia()
     })
 
 
