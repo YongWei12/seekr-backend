@@ -7,7 +7,7 @@ import json
 import struct
 app = Flask(__name__)
 
-#install gunicorn
+# install gunicorn
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -24,8 +24,8 @@ def index():
         })
 
 
-@app.route('/test/<message>', methods=['GET'])
-def getTest(message):
+@app.route('/defination/<message>', methods=['GET'])
+def getDefination(message):
     def get_investopedia():
         # let us call and use Dictionary definition
         investopediaMessage = message.replace(' ', '+')
@@ -38,7 +38,7 @@ def getTest(message):
             definition = pos[0].text[1::]
         except:
             definition = "the word cannot be found "
-        return ("I:"+definition)
+        return (definition)
 
     def get_dictionary():
         # let us call and use Dictionary definition
@@ -48,20 +48,57 @@ def getTest(message):
         source_code = requests.get(url)
         soup = BeautifulSoup(source_code.content, "lxml")
         pos = soup.findAll(
-            "span", {"class": "one-click-content css-1p89gle e1q3nk1v4"})
+            "span", {"class": "one-click-content"})
         try:
-            definition = pos[0].text
+            definition = pos[0].text + pos[1].text
         except:
             definition = "the word cannot be found "
-        return ("D:"+definition)
-
-    print(get_dictionary())
-    print(get_investopedia())
+        return (definition)
 
     return jsonify({
         'result': message,
-        'dictionary':get_dictionary(),
-        'investopedia':get_investopedia()
+        'dictionary': get_dictionary(),
+        'investopedia': get_investopedia()
+    })
+
+
+@app.route('/news/<message>', methods=['GET'])
+def getNews(message):
+    def get_news():    
+        newsMessage = message.replace(' ', '%20')
+        newsMessage = message.replace('-', '%20')
+        url = "https://www.businesstimes.com.sg/search/"+newsMessage
+        source_code = requests.get(url)
+        soup = BeautifulSoup(source_code.content, "lxml")
+        content = soup.findAll("div", {"class": "media-body"})
+
+        # # wipe the content in javascript
+        # send_message(encode_message("W"))
+        articles = list()
+
+        for article in content:
+            articleTitle = article.findAll("a")
+            articleTime = article.findAll("time")
+            try:
+                title = articleTitle[0].text
+                url = articleTitle[0]['href']
+                time = articleTime[0].text
+            except:
+                title = "the word cannot be found "
+                url = "the link cannot be found "
+                time= "the time cannot be found"
+            singleArticle={
+                "title": title,
+                "url":url,
+                "time":time
+            }
+            articles.append(singleArticle)
+        
+        return(articles)
+
+    return jsonify({
+        'result': message,
+        'articles': get_news()
     })
 
 
