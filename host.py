@@ -24,8 +24,8 @@ def index():
         })
 
 
-@app.route('/defination/<message>', methods=['GET'])
-def getDefination(message):
+@app.route('/definition/<message>', methods=['GET'])
+def getDefinition(message):
     def get_investopedia():
         # let us call and use Dictionary definition
         investopediaMessage = message.replace(' ', '+')
